@@ -199,27 +199,42 @@
         .btn-login:hover {
             background-color: #3d96ff;
         }
-        
+
         .hidden {
             display: none;
         }
-        
+
         @media (max-width: 768px) {
             .summary-cards {
                 flex-direction: column;
             }
-            
             .card {
                 width: 100%;
                 margin-bottom: 15px;
             }
-            
             .form-row {
                 flex-direction: column;
             }
-            
             .form-group {
                 margin-right: 0;
+                width: 100%;
+            }
+            .form-check {
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            .transactions-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .transactions-table th, .transactions-table td {
+                white-space: nowrap;
+            }
+            .btn-add {
+                width: 100%;
+            }
+            .btn-login {
                 width: 100%;
             }
         }
