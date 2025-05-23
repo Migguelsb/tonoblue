@@ -307,7 +307,7 @@
             <table class="transactions-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Usuário</th>
                         <th>Valor</th>
                         <th>Descrição</th>
                         <th>Data</th>
@@ -421,12 +421,12 @@
                 const row = document.createElement('tr');
                 
                 row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>R$ ${transaction.valor.toFixed(2)}</td>
-                    <td>${transaction.descricao}</td>
-                    <td>${formatDate(transaction.data)}</td>
-                    <td>${transaction.tipo === 'entrada' ? 'Entrada' : 'Saída'}</td>
-                `;
+    <td>${currentUser.nome}</td> <!-- Mostra o nome ao invés do ID -->
+    <td>R$ ${transaction.valor.toFixed(2)}</td>
+    <td>${transaction.descricao}</td>
+    <td>${formatDate(transaction.data)}</td>
+    <td>${transaction.tipo === 'entrada' ? 'Entrada' : 'Saída'}</td>
+`;
                 
                 if (transaction.tipo === 'entrada') {
                     row.querySelector('td:nth-child(2)').style.color = 'green';
