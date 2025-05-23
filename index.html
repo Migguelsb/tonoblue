@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
- 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -323,165 +322,149 @@
     </div>
 
     <script>
+        // Sample data storage (in a real app, this would be replaced with a backend)
+        let transactions = [];
+        let currentUser = null;
         
-    // Variáveis globais
-    let currentUser = null;
-    const API_URL = 'http://localhost/seu_diretorio'; // Altere para o caminho correto
-
-    // DOM Elements
-    const loginScreen = document.getElementById('login-screen');
-    const appScreen = document.getElementById('app-screen');
-    const loginForm = document.getElementById('login-form');
-    const transactionForm = document.getElementById('transaction-form');
-    const transactionsBody = document.getElementById('transactions-body');
-    const entradasTotal = document.getElementById('entradas-total');
-    const saidasTotal = document.getElementById('saidas-total');
-    const totalGeral = document.getElementById('total-geral');
-    
-    // Set today's date as default
-    document.getElementById('data').valueAsDate = new Date();
-    
-    // Login/Register
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+        // DOM Elements
+        const loginScreen = document.getElementById('login-screen');
+        const appScreen = document.getElementById('app-screen');
+        const loginForm = document.getElementById('login-form');
+        const transactionForm = document.getElementById('transaction-form');
+        const transactionsBody = document.getElementById('transactions-body');
+        const entradasTotal = document.getElementById('entradas-total');
+        const saidasTotal = document.getElementById('saidas-total');
+        const totalGeral = document.getElementById('total-geral');
         
-        const userData = {
-            nome: document.getElementById('nome').value,
-            cpf: document.getElementById('cpf').value,
-            email: document.getElementById('email').value,
-            senha: document.getElementById('senha').value
-        };
+        // Set today's date as default
+        document.getElementById('data').valueAsDate = new Date();
         
-        try {
-            const response = await fetch(`${API_URL}/usuarios.php`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData)
-            });
+        // Login/Register
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            const data = await response.json();
+            const nome = document.getElementById('nome').value;
+            const cpf = document.getElementById('cpf').value;
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
             
-            if (data.success) {
-                currentUser = {
-                    id: data.user_id,
-                    nome: userData.nome,
-                    email: userData.email
-                };
-                
-                alert('Login realizado com sucesso!');
-                loginScreen.classList.add('hidden');
-                appScreen.classList.remove('hidden');
-                loadUserData();
-            } else {
-                alert(data.message || 'Erro no cadastro');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Erro ao conectar com o servidor');
-        }
-    });
-    
-    // Add transaction
-    transactionForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const transactionData = {
-            valor: parseFloat(document.getElementById('valor').value),
-            descricao: document.getElementById('descricao').value,
-            data: document.getElementById('data').value,
-            fluxo: document.querySelector('input[name="tipo"]:checked').value === 'entrada',
-            user_id: currentUser.id
-        };
-        
-        try {
-            const response = await fetch(`${API_URL}/financeiro.php`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(transactionData)
-            });
+            // In a real app, you would send this to your backend
+            currentUser = {
+                id: Date.now(), // Using timestamp as temporary ID
+                nome,
+                cpf,
+                email,
+                senha
+            };
             
-            const data = await response.json();
+            // Show success message and switch to app screen
+            alert('Login realizado com sucesso!');
+            loginScreen.classList.add('hidden');
+            appScreen.classList.remove('hidden');
             
-            if (data.success) {
-                transactionForm.reset();
-                document.getElementById('data').valueAsDate = new Date();
-                loadUserData();
-                alert('Transação adicionada com sucesso!');
-            } else {
-                alert('Erro ao adicionar transação');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Erro ao conectar com o servidor');
-        }
-    });
-    
-    // Load user data
-    async function loadUserData() {
-        try {
-            const response = await fetch(`${API_URL}/financeiro.php?user_id=${currentUser.id}`);
-            const transactions = await response.json();
-            
-            updateTransactionsTable(transactions);
-            updateTotals(transactions);
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Erro ao carregar transações');
-        }
-    }
-    
-    // Update transactions table
-    function updateTransactionsTable(transactions) {
-        transactionsBody.innerHTML = '';
-        
-        transactions.forEach(transaction => {
-            const row = document.createElement('tr');
-            
-            row.innerHTML = `
-                <td>${transaction.id_transacao}</td>
-                <td>R$ ${parseFloat(transaction.valor_transacao).toFixed(2)}</td>
-                <td>${transaction.desc_transacao}</td>
-                <td>${formatDate(transaction.dt_transacao)}</td>
-                <td>${transaction.fluxo_transacao ? 'Entrada' : 'Saída'}</td>
-            `;
-            
-            if (transaction.fluxo_transacao) {
-                row.querySelector('td:nth-child(2)').style.color = 'green';
-            } else {
-                row.querySelector('td:nth-child(2)').style.color = 'red';
-            }
-            
-            transactionsBody.appendChild(row);
+            // Load user data (in a real app, this would come from the backend)
+            loadUserData();
         });
-    }
-    
-    // Update totals
-    function updateTotals(transactions) {
-        const entradas = transactions
-            .filter(t => t.fluxo_transacao)
-            .reduce((sum, t) => sum + parseFloat(t.valor_transacao), 0);
-            
-        const saidas = transactions
-            .filter(t => !t.fluxo_transacao)
-            .reduce((sum, t) => sum + parseFloat(t.valor_transacao), 0);
-            
-        const total = entradas - saidas;
         
-        entradasTotal.textContent = `R$ ${entradas.toFixed(2)}`;
-        saidasTotal.textContent = `R$ ${saidas.toFixed(2)}`;
-        totalGeral.textContent = `R$ ${total.toFixed(2)}`;
-    }
-    
-    // Format date for display
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('pt-BR');
-    }
-
+        // Add transaction
+        transactionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const valor = parseFloat(document.getElementById('valor').value);
+            const descricao = document.getElementById('descricao').value;
+            const data = document.getElementById('data').value;
+            const tipo = document.querySelector('input[name="tipo"]:checked').value;
+            
+            // Create transaction object
+            const transaction = {
+                id: Date.now(), // Using timestamp as temporary ID
+                valor,
+                descricao,
+                data,
+                tipo,
+                userId: currentUser.id
+            };
+            
+            // Add to transactions array
+            transactions.push(transaction);
+            
+            // Clear form
+            transactionForm.reset();
+            document.getElementById('data').valueAsDate = new Date();
+            
+            // Update UI
+            updateTransactionsTable();
+            updateTotals();
+            
+            // Show success message
+            alert('Transação adicionada com sucesso!');
+        });
+        
+        // Load user data
+        function loadUserData() {
+            // In a real app, you would fetch this from your backend
+            // For now, we'll just use the sample transactions array
+            updateTransactionsTable();
+            updateTotals();
+        }
+        
+        // Update transactions table
+        function updateTransactionsTable() {
+            // Filter transactions for current user
+            const userTransactions = transactions.filter(t => t.userId === currentUser.id);
+            
+            // Clear table
+            transactionsBody.innerHTML = '';
+            
+            // Add transactions to table
+            userTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${transaction.id}</td>
+                    <td>R$ ${transaction.valor.toFixed(2)}</td>
+                    <td>${transaction.descricao}</td>
+                    <td>${formatDate(transaction.data)}</td>
+                    <td>${transaction.tipo === 'entrada' ? 'Entrada' : 'Saída'}</td>
+                `;
+                
+                if (transaction.tipo === 'entrada') {
+                    row.querySelector('td:nth-child(2)').style.color = 'green';
+                } else {
+                    row.querySelector('td:nth-child(2)').style.color = 'red';
+                }
+                
+                transactionsBody.appendChild(row);
+            });
+        }
+        
+        // Update totals
+        function updateTotals() {
+            // Filter transactions for current user
+            const userTransactions = transactions.filter(t => t.userId === currentUser.id);
+            
+            // Calculate totals
+            const entradas = userTransactions
+                .filter(t => t.tipo === 'entrada')
+                .reduce((sum, t) => sum + t.valor, 0);
+                
+            const saidas = userTransactions
+                .filter(t => t.tipo === 'saida')
+                .reduce((sum, t) => sum + t.valor, 0);
+                
+            const total = entradas - saidas;
+            
+            // Update UI
+            entradasTotal.textContent = `R$ ${entradas.toFixed(2)}`;
+            saidasTotal.textContent = `R$ ${saidas.toFixed(2)}`;
+            totalGeral.textContent = `R$ ${total.toFixed(2)}`;
+        }
+        
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
     </script>
 </body>
 </html>
